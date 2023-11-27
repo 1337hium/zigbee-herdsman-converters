@@ -1249,6 +1249,26 @@ const definitions: Definition[] = [
         description: 'ORMANAS LED strip',
         extend: tradfriExtend.light_onoff_brightness_colortemp_color({colorTempRange: [250, 454]}),
     },
+    {
+        zigbeeModel: ['VALLHORN Wireless Motion Sensor'], // The model ID from: Device with modelID 'lumi.sens' is not supported.
+        model: 'E2134', // Vendor model number, look on the device for a model number
+        vendor: 'IKEA', // Vendor of the device (only used for documentation and startup logging)
+        description: 'VALLHORN Wireless Motion Sensor', // Description of the device, copy from vendor site. (only used for documentation and startup logging)
+        fromZigbee: [fz.occupancy, fz.battery, fz.illuminance],
+        toZigbee: [],
+        exposes: [e.occupancy(), e.battery(), e.illuminance()],
+        configure: async (device,cordinatorEndpoint,logger)=>{
+	        const endpoint1 = device.getEndpoint(1)
+	        const endpoint2 = device.getEndpoint(2)	
+	        const endpoint3 = device.getEndpoint(3)
+	        await reporting.bind(endpoint1, cordinatorEndpoint, ['genPowerCfg']);
+	        await reporting.batteryPercentageRemaining(endpoint1)
+	        await reporting.bind(endpoint2, cordinatorEndpoint, ['msOccupancySensing']);
+	        await reporting.occupancy(endpoint2)
+	        await reporting.bind(endpoint3, cordinatorEndpoint, ['msIlluminanceMeasurement']);
+	        await reporting.illuminance(endpoint3)
+        },
+    },
 ];
 
 export default definitions;
